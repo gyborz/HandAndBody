@@ -59,55 +59,59 @@ class CameraView: UIView {
         CATransaction.commit()
     }
 
-    func showPoints(wrist: CGPoint, thumb: [CGPoint], index: [CGPoint], middle: [CGPoint], ring: [CGPoint], little: [CGPoint]) {
+    func showPoints(for hands: [Hand]) {
         linePath.removeAllPoints()
         jointsPath.removeAllPoints()
 
-        linePath.move(to: wrist)
-        jointsPath.move(to: wrist)
-        jointsPath.addArc(withCenter: wrist, radius: 5, startAngle: 0, endAngle: 2 * .pi, clockwise: true)
-        for point in thumb {
-            jointsPath.move(to: point)
-            jointsPath.addArc(withCenter: point, radius: 5, startAngle: 0, endAngle: 2 * .pi, clockwise: true)
+        for hand in hands {
+            if let wrist = hand.wrist {
+                linePath.move(to: wrist)
+                jointsPath.move(to: wrist)
+                jointsPath.addArc(withCenter: wrist, radius: 5, startAngle: 0, endAngle: 2 * .pi, clockwise: true)
+                for point in hand.thumbFinger {
+                    jointsPath.move(to: point)
+                    jointsPath.addArc(withCenter: point, radius: 5, startAngle: 0, endAngle: 2 * .pi, clockwise: true)
 
-            linePath.addLine(to: point)
-            linePath.move(to: point)
-        }
+                    linePath.addLine(to: point)
+                    linePath.move(to: point)
+                }
 
-        linePath.move(to: wrist)
-        for point in index {
-            jointsPath.move(to: point)
-            jointsPath.addArc(withCenter: point, radius: 5, startAngle: 0, endAngle: 2 * .pi, clockwise: true)
+                linePath.move(to: wrist)
+                for point in hand.indexFinger {
+                    jointsPath.move(to: point)
+                    jointsPath.addArc(withCenter: point, radius: 5, startAngle: 0, endAngle: 2 * .pi, clockwise: true)
 
-            linePath.addLine(to: point)
-            linePath.move(to: point)
-        }
+                    linePath.addLine(to: point)
+                    linePath.move(to: point)
+                }
 
-        linePath.move(to: wrist)
-        for point in middle {
-            jointsPath.move(to: point)
-            jointsPath.addArc(withCenter: point, radius: 5, startAngle: 0, endAngle: 2 * .pi, clockwise: true)
+                linePath.move(to: wrist)
+                for point in hand.middleFinger {
+                    jointsPath.move(to: point)
+                    jointsPath.addArc(withCenter: point, radius: 5, startAngle: 0, endAngle: 2 * .pi, clockwise: true)
 
-            linePath.addLine(to: point)
-            linePath.move(to: point)
-        }
+                    linePath.addLine(to: point)
+                    linePath.move(to: point)
+                }
 
-        linePath.move(to: wrist)
-        for point in ring {
-            jointsPath.move(to: point)
-            jointsPath.addArc(withCenter: point, radius: 5, startAngle: 0, endAngle: 2 * .pi, clockwise: true)
+                linePath.move(to: wrist)
+                for point in hand.ringFinger {
+                    jointsPath.move(to: point)
+                    jointsPath.addArc(withCenter: point, radius: 5, startAngle: 0, endAngle: 2 * .pi, clockwise: true)
 
-            linePath.addLine(to: point)
-            linePath.move(to: point)
-        }
+                    linePath.addLine(to: point)
+                    linePath.move(to: point)
+                }
 
-        linePath.move(to: wrist)
-        for point in little {
-            jointsPath.move(to: point)
-            jointsPath.addArc(withCenter: point, radius: 5, startAngle: 0, endAngle: 2 * .pi, clockwise: true)
+                linePath.move(to: wrist)
+                for point in hand.littleFinger {
+                    jointsPath.move(to: point)
+                    jointsPath.addArc(withCenter: point, radius: 5, startAngle: 0, endAngle: 2 * .pi, clockwise: true)
 
-            linePath.addLine(to: point)
-            linePath.move(to: point)
+                    linePath.addLine(to: point)
+                    linePath.move(to: point)
+                }
+            }
         }
 
         overlayLayer.lineWidth = 2

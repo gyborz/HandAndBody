@@ -34,7 +34,7 @@ class CameraViewController: UIViewController {
         drawOverlay.lineCap = .round
         view.layer.addSublayer(drawOverlay)
         // This sample app detects one hand only.
-        handPoseRequest.maximumHandCount = 1
+        handPoseRequest.maximumHandCount = 2
         // Add state change handler to hand gesture processor.
         gestureProcessor.didChangeStateClosure = { [weak self] state in
             self?.handleGestureStateChange(state: state)
@@ -119,20 +119,23 @@ class CameraViewController: UIViewController {
         gestureProcessor.processPointsPair((thumbPointConverted, indexPointConverted))
     }
 
-    func processPoints(wrist: CGPoint?, thumb: [CGPoint], index: [CGPoint], middle: [CGPoint], ring: [CGPoint], little: [CGPoint]) {
-        guard let wrist = wrist else {
-            cameraView.showPoints([], color: .clear)
-            return
+    func processPoints(hands: [Hand]) {
+        var processedHands: [Hand] = []
+        hands.forEach { hand in
+            if let wrist = hand.wrist {
+                let convertedThumb = hand.thumbFinger.map { cameraView.previewLayer.layerPointConverted(fromCaptureDevicePoint: $0) }
+                let convertedIndex = hand.indexFinger.map { cameraView.previewLayer.layerPointConverted(fromCaptureDevicePoint: $0) }
+                let convertedMiddle = hand.middleFinger.map { cameraView.previewLayer.layerPointConverted(fromCaptureDevicePoint: $0) }
+                let convertedRing = hand.ringFinger.map { cameraView.previewLayer.layerPointConverted(fromCaptureDevicePoint: $0) }
+                let convertedLittle = hand.littleFinger.map { cameraView.previewLayer.layerPointConverted(fromCaptureDevicePoint: $0) }
+                let convertedWrist = cameraView.previewLayer.layerPointConverted(fromCaptureDevicePoint: wrist)
+                
+                processedHands.append(Hand(thumbFinger: convertedThumb, indexFinger: convertedIndex, middleFinger: convertedMiddle, ringFinger: convertedRing, littleFinger: convertedLittle, wrist: convertedWrist))
+            } else {
+                cameraView.showPoints([], color: .clear)
+            }
         }
-
-        let convertedThumb = thumb.map { cameraView.previewLayer.layerPointConverted(fromCaptureDevicePoint: $0) }
-        let convertedIndex = index.map { cameraView.previewLayer.layerPointConverted(fromCaptureDevicePoint: $0) }
-        let convertedMiddle = middle.map { cameraView.previewLayer.layerPointConverted(fromCaptureDevicePoint: $0) }
-        let convertedRing = ring.map { cameraView.previewLayer.layerPointConverted(fromCaptureDevicePoint: $0) }
-        let convertedLittle = little.map { cameraView.previewLayer.layerPointConverted(fromCaptureDevicePoint: $0) }
-        let convertedWrist = cameraView.previewLayer.layerPointConverted(fromCaptureDevicePoint: wrist)
-
-        cameraView.showPoints(wrist: convertedWrist, thumb: convertedThumb, index: convertedIndex, middle: convertedMiddle, ring: convertedRing, little: convertedLittle)
+        cameraView.showPoints(for: processedHands)
     }
 
     private func handleGestureStateChange(state: HandGestureProcessor.State) {
@@ -224,6 +227,7 @@ class CameraViewController: UIViewController {
 
 extension CameraViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
     public func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
+        var hands: [Hand] = []
         var thumbFinger: [CGPoint] = []
         var indexFinger: [CGPoint] = []
         var middleFinger: [CGPoint] = []
@@ -233,7 +237,7 @@ extension CameraViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
 
         defer {
             DispatchQueue.main.sync {
-                self.processPoints(wrist: wrist, thumb: thumbFinger, index: indexFinger, middle: middleFinger, ring: ringFinger, little: littleFinger)
+                self.processPoints(hands: hands)
             }
         }
 
@@ -243,81 +247,83 @@ extension CameraViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
             try handler.perform([handPoseRequest])
             // Continue only when a hand was detected in the frame.
             // Since we set the maximumHandCount property of the request to 1, there will be at most one observation.
-            guard let observation = handPoseRequest.results?.first else {
-                return
-            }
+            guard let observations = handPoseRequest.results else { return }
 
-            let thumbPoints = try observation.recognizedPoints(.thumb)
-            let indexFingerPoints = try observation.recognizedPoints(.indexFinger)
-            let middleFingerPoints = try observation.recognizedPoints(.middleFinger)
-            let ringFingerPoints = try observation.recognizedPoints(.ringFinger)
-            let littleFingerPoints = try observation.recognizedPoints(.littleFinger)
-            let wristPoint = try observation.recognizedPoint(.wrist)
+            for observation in observations {
+                let thumbPoints = try observation.recognizedPoints(.thumb)
+                let indexFingerPoints = try observation.recognizedPoints(.indexFinger)
+                let middleFingerPoints = try observation.recognizedPoints(.middleFinger)
+                let ringFingerPoints = try observation.recognizedPoints(.ringFinger)
+                let littleFingerPoints = try observation.recognizedPoints(.littleFinger)
+                let wristPoint = try observation.recognizedPoint(.wrist)
 
-            var thumbDict: [Int: CGPoint] = [:]
-            for keyValuePair in thumbPoints {
-                let key = keyValuePair.key
-                let value = keyValuePair.value
-                if value.confidence > 0.3 {
-                    let index = getArrayIndexFromFingerPoint(fingerPointType: key)
-                    let point = CGPoint(x: value.location.x, y: 1 - value.location.y)
-                    thumbDict[index] = point
+                var thumbDict: [Int: CGPoint] = [:]
+                for keyValuePair in thumbPoints {
+                    let key = keyValuePair.key
+                    let value = keyValuePair.value
+                    if value.confidence > 0.3 {
+                        let index = getArrayIndexFromFingerPoint(fingerPointType: key)
+                        let point = CGPoint(x: value.location.x, y: 1 - value.location.y)
+                        thumbDict[index] = point
+                    }
                 }
-            }
-            thumbFinger = thumbDict.sorted(by: { $0.key < $1.key }).map { $0.value }
+                thumbFinger = thumbDict.sorted(by: { $0.key < $1.key }).map { $0.value }
 
-            var indexDict: [Int: CGPoint] = [:]
-            for keyValuePair in indexFingerPoints {
-                let key = keyValuePair.key
-                let value = keyValuePair.value
-                if value.confidence > 0.3 {
-                    let index = getArrayIndexFromFingerPoint(fingerPointType: key)
-                    let point = CGPoint(x: value.location.x, y: 1 - value.location.y)
-                    indexDict[index] = point
+                var indexDict: [Int: CGPoint] = [:]
+                for keyValuePair in indexFingerPoints {
+                    let key = keyValuePair.key
+                    let value = keyValuePair.value
+                    if value.confidence > 0.3 {
+                        let index = getArrayIndexFromFingerPoint(fingerPointType: key)
+                        let point = CGPoint(x: value.location.x, y: 1 - value.location.y)
+                        indexDict[index] = point
+                    }
                 }
-            }
-            indexFinger = indexDict.sorted(by: { $0.key < $1.key }).map { $0.value }
+                indexFinger = indexDict.sorted(by: { $0.key < $1.key }).map { $0.value }
 
-            var middleDict: [Int: CGPoint] = [:]
-            for keyValuePair in middleFingerPoints {
-                let key = keyValuePair.key
-                let value = keyValuePair.value
-                if value.confidence > 0.3 {
-                    let index = getArrayIndexFromFingerPoint(fingerPointType: key)
-                    let point = CGPoint(x: value.location.x, y: 1 - value.location.y)
-                    middleDict[index] = point
+                var middleDict: [Int: CGPoint] = [:]
+                for keyValuePair in middleFingerPoints {
+                    let key = keyValuePair.key
+                    let value = keyValuePair.value
+                    if value.confidence > 0.3 {
+                        let index = getArrayIndexFromFingerPoint(fingerPointType: key)
+                        let point = CGPoint(x: value.location.x, y: 1 - value.location.y)
+                        middleDict[index] = point
+                    }
                 }
-            }
-            middleFinger = middleDict.sorted(by: { $0.key < $1.key }).map { $0.value }
+                middleFinger = middleDict.sorted(by: { $0.key < $1.key }).map { $0.value }
 
-            var ringDict: [Int: CGPoint] = [:]
-            for keyValuePair in ringFingerPoints {
-                let key = keyValuePair.key
-                let value = keyValuePair.value
-                if value.confidence > 0.3 {
-                    let index = getArrayIndexFromFingerPoint(fingerPointType: key)
-                    let point = CGPoint(x: value.location.x, y: 1 - value.location.y)
-                    ringDict[index] = point
+                var ringDict: [Int: CGPoint] = [:]
+                for keyValuePair in ringFingerPoints {
+                    let key = keyValuePair.key
+                    let value = keyValuePair.value
+                    if value.confidence > 0.3 {
+                        let index = getArrayIndexFromFingerPoint(fingerPointType: key)
+                        let point = CGPoint(x: value.location.x, y: 1 - value.location.y)
+                        ringDict[index] = point
+                    }
                 }
-            }
-            ringFinger = ringDict.sorted(by: { $0.key < $1.key }).map { $0.value }
+                ringFinger = ringDict.sorted(by: { $0.key < $1.key }).map { $0.value }
 
-            var littleDict: [Int: CGPoint] = [:]
-            for keyValuePair in littleFingerPoints {
-                let key = keyValuePair.key
-                let value = keyValuePair.value
-                if value.confidence > 0.3 {
-                    let index = getArrayIndexFromFingerPoint(fingerPointType: key)
-                    let point = CGPoint(x: value.location.x, y: 1 - value.location.y)
-                    littleDict[index] = point
+                var littleDict: [Int: CGPoint] = [:]
+                for keyValuePair in littleFingerPoints {
+                    let key = keyValuePair.key
+                    let value = keyValuePair.value
+                    if value.confidence > 0.3 {
+                        let index = getArrayIndexFromFingerPoint(fingerPointType: key)
+                        let point = CGPoint(x: value.location.x, y: 1 - value.location.y)
+                        littleDict[index] = point
+                    }
                 }
-            }
-            littleFinger = littleDict.sorted(by: { $0.key < $1.key }).map { $0.value }
+                littleFinger = littleDict.sorted(by: { $0.key < $1.key }).map { $0.value }
 
-            if wristPoint.confidence > 0.3 {
-                wrist = CGPoint(x: wristPoint.location.x, y: 1 - wristPoint.location.y)
-            }
+                if wristPoint.confidence > 0.3 {
+                    wrist = CGPoint(x: wristPoint.location.x, y: 1 - wristPoint.location.y)
+                }
 
+                let hand = Hand(thumbFinger: thumbFinger, indexFinger: indexFinger, middleFinger: middleFinger, ringFinger: ringFinger, littleFinger: littleFinger, wrist: wrist)
+                hands.append(hand)
+            }
         } catch {
             cameraFeedSession?.stopRunning()
             let error = AppError.visionError(error: error)
