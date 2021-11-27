@@ -16,10 +16,44 @@ class CameraViewController: UIViewController {
     private var cameraFeedSession: AVCaptureSession?
     private var handPoseRequest = VNDetectHumanHandPoseRequest()
 
+    private let bottomStack = UIStackView()
+    private let handButton = UIButton()
+    private let bodyButton = UIButton()
+    private let switchCameraButton = UIButton()
+
+    private enum VisisonMode {
+        case handPose
+        case bodyPose
+    }
+
+    private var visionMode: VisisonMode = .handPose {
+        didSet {
+            switch visionMode {
+            case .handPose:
+                handButton.setImage(UIImage(systemName: "hand.raised.fill"), for: .normal)
+                bodyButton.setImage(UIImage(systemName: "person"), for: .normal)
+            case .bodyPose:
+                handButton.setImage(UIImage(systemName: "hand.raised"), for: .normal)
+                bodyButton.setImage(UIImage(systemName: "person.fill"), for: .normal)
+            }
+        }
+    }
+
+    private var isFrontFacingCamera: Bool = true {
+        didSet {
+            if isFrontFacingCamera {
+                print("todo")
+            } else {
+                print("todo")
+            }
+        }
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
         UIApplication.shared.isIdleTimerDisabled = true
-        // This sample app detects one hand only.
+        setupUI()
+
         handPoseRequest.maximumHandCount = 2
     }
 
@@ -40,6 +74,44 @@ class CameraViewController: UIViewController {
     override func viewWillDisappear(_ animated: Bool) {
         cameraFeedSession?.stopRunning()
         super.viewWillDisappear(animated)
+    }
+
+    private func setupUI() {
+        bottomStack.translatesAutoresizingMaskIntoConstraints = false
+        bottomStack.axis = .horizontal
+        bottomStack.spacing = 2
+        bottomStack.distribution = .equalSpacing
+        view.addSubview(bottomStack)
+        NSLayoutConstraint.activate([
+            bottomStack.widthAnchor.constraint(equalToConstant: 250),
+            bottomStack.heightAnchor.constraint(equalToConstant: 120),
+            bottomStack.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -8),
+            bottomStack.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+        ])
+
+        handButton.translatesAutoresizingMaskIntoConstraints = false
+        handButton.tag = 1
+        handButton.setImage(UIImage(systemName: "hand.raised.fill"), for: .normal)
+        handButton.tintColor = .white
+        handButton.setPreferredSymbolConfiguration(UIImage.SymbolConfiguration(pointSize: 26), forImageIn: .normal)
+        handButton.addTarget(self, action: #selector(handleHandButtonEvent), for: .touchUpInside)
+
+        bodyButton.translatesAutoresizingMaskIntoConstraints = false
+        bodyButton.tag = 2
+        bodyButton.setImage(UIImage(systemName: "person"), for: .normal)
+        bodyButton.tintColor = .white
+        bodyButton.setPreferredSymbolConfiguration(UIImage.SymbolConfiguration(pointSize: 26), forImageIn: .normal)
+        bodyButton.addTarget(self, action: #selector(handleBodyButtonEvent), for: .touchUpInside)
+
+        switchCameraButton.translatesAutoresizingMaskIntoConstraints = false
+        switchCameraButton.setImage(UIImage(systemName: "arrow.triangle.2.circlepath.camera"), for: .normal)
+        switchCameraButton.tintColor = .white
+        switchCameraButton.setPreferredSymbolConfiguration(UIImage.SymbolConfiguration(pointSize: 26), forImageIn: .normal)
+        switchCameraButton.addTarget(self, action: #selector(handleCameraButtonEvent), for: .touchUpInside)
+
+        bottomStack.addArrangedSubview(handButton)
+        bottomStack.addArrangedSubview(bodyButton)
+        bottomStack.addArrangedSubview(switchCameraButton)
     }
 
     func setupAVSession() throws {
@@ -86,13 +158,25 @@ class CameraViewController: UIViewController {
                 let convertedRing = hand.ringFinger.map { cameraView.previewLayer.layerPointConverted(fromCaptureDevicePoint: $0) }
                 let convertedLittle = hand.littleFinger.map { cameraView.previewLayer.layerPointConverted(fromCaptureDevicePoint: $0) }
                 let convertedWrist = cameraView.previewLayer.layerPointConverted(fromCaptureDevicePoint: wrist)
-                
+
                 processedHands.append(Hand(thumbFinger: convertedThumb, indexFinger: convertedIndex, middleFinger: convertedMiddle, ringFinger: convertedRing, littleFinger: convertedLittle, wrist: convertedWrist))
             } else {
                 cameraView.showPoints([], color: .clear)
             }
         }
         cameraView.showPoints(for: processedHands)
+    }
+
+    @objc func handleHandButtonEvent(_ sender: UIButton) {
+        visionMode = .handPose
+    }
+
+    @objc func handleBodyButtonEvent(_ sender: UIButton) {
+        visionMode = .bodyPose
+    }
+
+    @objc func handleCameraButtonEvent(_ sender: UIButton) {
+        isFrontFacingCamera.toggle()
     }
 
     private func getArrayIndexFromFingerPoint(fingerPointType: VNHumanHandPoseObservation.JointName) -> Int {
