@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E76911AD2752AA9400FA5BAE /* Body.swift in Sources */ = {isa = PBXBuildFile; fileRef = E76911AC2752AA9400FA5BAE /* Body.swift */; };
+		E76911AF2752CBD900FA5BAE /* CameraViewController+VideoOutput.swift in Sources */ = {isa = PBXBuildFile; fileRef = E76911AE2752CBD900FA5BAE /* CameraViewController+VideoOutput.swift */; };
 		E76CC6FF274FDC5800016BF3 /* Hand.swift in Sources */ = {isa = PBXBuildFile; fileRef = E76CC6FE274FDC5800016BF3 /* Hand.swift */; };
 		E7A7C021274C2F3200AEF29C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A7C020274C2F3200AEF29C /* AppDelegate.swift */; };
 		E7A7C023274C2F3200AEF29C /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A7C022274C2F3200AEF29C /* SceneDelegate.swift */; };
@@ -18,6 +20,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		E76911AC2752AA9400FA5BAE /* Body.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Body.swift; sourceTree = "<group>"; };
+		E76911AE2752CBD900FA5BAE /* CameraViewController+VideoOutput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CameraViewController+VideoOutput.swift"; sourceTree = "<group>"; };
 		E76CC6FE274FDC5800016BF3 /* Hand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Hand.swift; sourceTree = "<group>"; };
 		E7A7C01D274C2F3200AEF29C /* HandAndBody.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HandAndBody.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E7A7C020274C2F3200AEF29C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -69,6 +73,8 @@
 				E7A7C02E274C2F3300AEF29C /* Info.plist */,
 				E7A7C034274C2F6D00AEF29C /* CameraView.swift */,
 				E76CC6FE274FDC5800016BF3 /* Hand.swift */,
+				E76911AC2752AA9400FA5BAE /* Body.swift */,
+				E76911AE2752CBD900FA5BAE /* CameraViewController+VideoOutput.swift */,
 			);
 			path = HandAndBody;
 			sourceTree = "<group>";
@@ -147,8 +153,10 @@
 				E7A7C025274C2F3200AEF29C /* CameraViewController.swift in Sources */,
 				E76CC6FF274FDC5800016BF3 /* Hand.swift in Sources */,
 				E7A7C021274C2F3200AEF29C /* AppDelegate.swift in Sources */,
+				E76911AD2752AA9400FA5BAE /* Body.swift in Sources */,
 				E7A7C023274C2F3200AEF29C /* SceneDelegate.swift in Sources */,
 				E7A7C035274C2F6D00AEF29C /* CameraView.swift in Sources */,
+				E76911AF2752CBD900FA5BAE /* CameraViewController+VideoOutput.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
