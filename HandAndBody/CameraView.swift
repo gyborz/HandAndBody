@@ -123,4 +123,8 @@ class CameraView: UIView {
         jointsLayer.path = jointsPath.cgPath
         CATransaction.commit()
     }
+    
+    func showPoints(for bodies: [Body]) {
+        
+    }
 }

@@ -67,6 +67,7 @@
 				E7A7C020274C2F3200AEF29C /* AppDelegate.swift */,
 				E7A7C022274C2F3200AEF29C /* SceneDelegate.swift */,
 				E7A7C024274C2F3200AEF29C /* CameraViewController.swift */,
+				E76911AE2752CBD900FA5BAE /* CameraViewController+VideoOutput.swift */,
 				E7A7C026274C2F3200AEF29C /* Main.storyboard */,
 				E7A7C029274C2F3300AEF29C /* Assets.xcassets */,
 				E7A7C02B274C2F3300AEF29C /* LaunchScreen.storyboard */,
@@ -74,7 +75,6 @@
 				E7A7C034274C2F6D00AEF29C /* CameraView.swift */,
 				E76CC6FE274FDC5800016BF3 /* Hand.swift */,
 				E76911AC2752AA9400FA5BAE /* Body.swift */,
-				E76911AE2752CBD900FA5BAE /* CameraViewController+VideoOutput.swift */,
 			);
 			path = HandAndBody;
 			sourceTree = "<group>";
