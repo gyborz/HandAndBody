@@ -65,7 +65,7 @@ extension CameraViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
             for keyValuePair in thumbPoints {
                 let key = keyValuePair.key
                 let value = keyValuePair.value
-                if value.confidence > 0.3 {
+                if value.confidence > confidenceLevel {
                     let index = getArrayIndexFromFingerPoint(fingerPointType: key)
                     let point = CGPoint(x: value.location.x, y: 1 - value.location.y)
                     thumbDict[index] = point
@@ -77,7 +77,7 @@ extension CameraViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
             for keyValuePair in indexFingerPoints {
                 let key = keyValuePair.key
                 let value = keyValuePair.value
-                if value.confidence > 0.3 {
+                if value.confidence > confidenceLevel {
                     let index = getArrayIndexFromFingerPoint(fingerPointType: key)
                     let point = CGPoint(x: value.location.x, y: 1 - value.location.y)
                     indexDict[index] = point
@@ -89,7 +89,7 @@ extension CameraViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
             for keyValuePair in middleFingerPoints {
                 let key = keyValuePair.key
                 let value = keyValuePair.value
-                if value.confidence > 0.3 {
+                if value.confidence > confidenceLevel {
                     let index = getArrayIndexFromFingerPoint(fingerPointType: key)
                     let point = CGPoint(x: value.location.x, y: 1 - value.location.y)
                     middleDict[index] = point
@@ -101,7 +101,7 @@ extension CameraViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
             for keyValuePair in ringFingerPoints {
                 let key = keyValuePair.key
                 let value = keyValuePair.value
-                if value.confidence > 0.3 {
+                if value.confidence > confidenceLevel {
                     let index = getArrayIndexFromFingerPoint(fingerPointType: key)
                     let point = CGPoint(x: value.location.x, y: 1 - value.location.y)
                     ringDict[index] = point
@@ -113,7 +113,7 @@ extension CameraViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
             for keyValuePair in littleFingerPoints {
                 let key = keyValuePair.key
                 let value = keyValuePair.value
-                if value.confidence > 0.3 {
+                if value.confidence > confidenceLevel {
                     let index = getArrayIndexFromFingerPoint(fingerPointType: key)
                     let point = CGPoint(x: value.location.x, y: 1 - value.location.y)
                     littleDict[index] = point
@@ -121,7 +121,7 @@ extension CameraViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
             }
             littleFinger = littleDict.sorted(by: { $0.key < $1.key }).map { $0.value }
 
-            if wristPoint.confidence > 0.3 {
+            if wristPoint.confidence > confidenceLevel {
                 wrist = CGPoint(x: wristPoint.location.x, y: 1 - wristPoint.location.y)
             }
 
@@ -150,7 +150,7 @@ extension CameraViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
             for keyValuePair in facePoints {
                 let key = keyValuePair.key
                 let value = keyValuePair.value
-                if value.confidence > 0.3 {
+                if value.confidence > confidenceLevel {
                     let index = getArrayIndexFromBodyPointFace(bodyPoint: key)
                     let point = CGPoint(x: value.location.x, y: 1 - value.location.y)
                     faceDict[index] = point
@@ -162,7 +162,7 @@ extension CameraViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
             for keyValuePair in rightArmPoints {
                 let key = keyValuePair.key
                 let value = keyValuePair.value
-                if value.confidence > 0.3 {
+                if value.confidence > confidenceLevel {
                     let index = getArrayIndexFromBodyPointArm(bodyPoint: key)
                     let point = CGPoint(x: value.location.x, y: 1 - value.location.y)
                     rightArmDict[index] = point
@@ -174,7 +174,7 @@ extension CameraViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
             for keyValuePair in leftArmPoints {
                 let key = keyValuePair.key
                 let value = keyValuePair.value
-                if value.confidence > 0.3 {
+                if value.confidence > confidenceLevel {
                     let index = getArrayIndexFromBodyPointArm(bodyPoint: key)
                     let point = CGPoint(x: value.location.x, y: 1 - value.location.y)
                     leftArmDict[index] = point
@@ -185,7 +185,7 @@ extension CameraViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
             for keyValuePair in torsoPoints {
                 let key = keyValuePair.key
                 let value = keyValuePair.value
-                if value.confidence > 0.3 {
+                if value.confidence > confidenceLevel {
                     let point = CGPoint(x: value.location.x, y: 1 - value.location.y)
                     torso[key] = point
                 }
@@ -195,7 +195,7 @@ extension CameraViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
             for keyValuePair in rightLegPoints {
                 let key = keyValuePair.key
                 let value = keyValuePair.value
-                if value.confidence > 0.3 {
+                if value.confidence > confidenceLevel {
                     let index = getArrayIndexFromBodyPointLeg(bodyPoint: key)
                     let point = CGPoint(x: value.location.x, y: 1 - value.location.y)
                     rightLegDict[index] = point
@@ -207,7 +207,7 @@ extension CameraViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
             for keyValuePair in leftLegPoints {
                 let key = keyValuePair.key
                 let value = keyValuePair.value
-                if value.confidence > 0.3 {
+                if value.confidence > confidenceLevel {
                     let index = getArrayIndexFromBodyPointLeg(bodyPoint: key)
                     let point = CGPoint(x: value.location.x, y: 1 - value.location.y)
                     leftLegDict[index] = point

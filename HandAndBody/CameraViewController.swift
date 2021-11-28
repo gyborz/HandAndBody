@@ -21,6 +21,12 @@ class CameraViewController: UIViewController {
 
     var handPoseRequest = VNDetectHumanHandPoseRequest()
     var bodyPoseRequest = VNDetectHumanBodyPoseRequest()
+    
+    let confidenceLevel: VNConfidence = 0.15
+    
+    override var shouldAutorotate: Bool {
+        return false
+    }
 
     private let bottomStack = UIStackView()
     private let handButton = UIButton()
@@ -56,7 +62,7 @@ class CameraViewController: UIViewController {
         UIApplication.shared.isIdleTimerDisabled = true
         setupUI()
 
-        handPoseRequest.maximumHandCount = 2
+        handPoseRequest.maximumHandCount = 4
     }
 
     override func viewDidAppear(_ animated: Bool) {
