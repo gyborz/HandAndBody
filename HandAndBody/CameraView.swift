@@ -165,6 +165,7 @@ class CameraView: UIView {
             // right hip
             jointsPath.move(to: rightHip)
             jointsPath.addArc(withCenter: rightHip, radius: radiusConstant, startAngle: 0, endAngle: 2 * .pi, clockwise: true)
+            linePath.move(to: root)
             linePath.addLine(to: rightHip)
 
             // left hip

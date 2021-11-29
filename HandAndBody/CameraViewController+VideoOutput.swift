@@ -143,7 +143,7 @@ extension CameraViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
             let rightArmPoints = try observation.recognizedPoints(.rightArm)
             let leftArmPoints = try observation.recognizedPoints(.leftArm)
             let torsoPoints = try observation.recognizedPoints(.torso)
-            let rightLegPoints = try observation.recognizedPoints(.rightLeg)
+            let rightLegPoints = try observation.recognizedPoints(.all)
             let leftLegPoints = try observation.recognizedPoints(.leftLeg)
 
             var faceDict: [Int: CGPoint] = [:]
@@ -195,7 +195,8 @@ extension CameraViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
             for keyValuePair in rightLegPoints {
                 let key = keyValuePair.key
                 let value = keyValuePair.value
-                if value.confidence > confidenceLevel {
+                let rightLegKeys: [VNHumanBodyPoseObservation.JointName] = [.rightHip, .rightKnee, .rightAnkle]
+                if value.confidence > confidenceLevel, rightLegKeys.contains(key) {
                     let index = getArrayIndexFromBodyPointLeg(bodyPoint: key)
                     let point = CGPoint(x: value.location.x, y: 1 - value.location.y)
                     rightLegDict[index] = point
